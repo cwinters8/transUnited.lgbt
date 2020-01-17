@@ -1,5 +1,21 @@
+:root {
+  --main-bg-color: #282c34;
+  --main-text-color: white;
+  --accent-bg-color: #51a3d3;
+}
+
 .App {
   text-align: center;
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+}
+
+.navbar {
+  background-color: var(--accent-bg-color);
+}
+
+.navbar a {
+  color: var(--main-text-color);
 }
 
 .App-logo {
@@ -14,14 +30,12 @@
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
 .App-link {

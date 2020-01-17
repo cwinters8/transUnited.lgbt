@@ -2,9 +2,15 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+// reactstrap components
+import {Navbar, NavbarBrand} from 'reactstrap';
+
 function App() {
   return (
     <div className="App">
+      <Navbar expand="md">
+        <NavbarBrand href="/">transUnited</NavbarBrand>
+      </Navbar>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
