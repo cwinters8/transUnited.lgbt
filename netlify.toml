@@ -1,3 +1,6 @@
 [build]
 command = "cd client/web && npm install && npm run build && cd ../../functions/subscribe && npm install"
 functions = "functions"
+
+[dev]
+command = "cd client/web && npm start"
