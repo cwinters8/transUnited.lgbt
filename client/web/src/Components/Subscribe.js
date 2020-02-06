@@ -37,9 +37,14 @@ class Subscribe extends React.Component {
         form.insertBefore(error, button);
       }
     } else {
+      // conditionally set the URL depending on env
+      let url = '';
+      if (process.env.NODE_ENV === 'development') {
+        url += 'http://localhost:34567'
+      }
+      url += '/.netlify/functions/subscribe';
       // execute function that submits to the MailChimp API
-      // TODO: fix path for development mode. Conditionally get the URL for DEV or PROD
-      fetch('/.netlify/functions/subscribe', {
+      fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -50,7 +55,7 @@ class Subscribe extends React.Component {
           lastName
         })
       }).then(res => {
-        console.log(res.json());
+        console.log(res);
         this.props.toggleModal();
       }).catch(err => {
         console.error(err);

@@ -2,6 +2,26 @@ const axios = require('axios').default;
 
 // Serverless function that subscribes an email address to the MailChimp mailing list
 exports.handler = (event, context, callback) => {
+  // handle OPTIONS requests - should enable CORS
+  console.log(event.httpMethod);
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS'
+  };
+  if (event.httpMethod === 'OPTIONS') {
+    callback(null, {
+      statusCode: 200,
+      headers,
+      body: 'Preflight'
+    });
+    return {
+      statusCode: 200,
+      headers,
+      body: 'Preflight'
+    }
+  }
+
   const mailchimp = 'https://us4.api.mailchimp.com/3.0';
   const apiKey = process.env.APIKEY;
   const listId = process.env.LISTID;
@@ -33,10 +53,18 @@ exports.handler = (event, context, callback) => {
   }).then(res => {
     callback(null, {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({data: res.data})
     });
   }).catch(err => {
-    callback(err);
-    throw err;
+    callback(err, {
+      statusCode: 502,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: err
+    });
   });
 }
