@@ -32,8 +32,7 @@ exports.handler = (event, context, callback) => {
   const lastName = eventBody.lastName;
   if (!email) {
     // send an error if no email is found
-    callback({error: 'Email not found'});
-    throw 'Email not found';
+    callback({error: 'Email not found'}, {headers});
   }
   // build an object to send with the post request
   const data = {
@@ -53,18 +52,20 @@ exports.handler = (event, context, callback) => {
   }).then(res => {
     callback(null, {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers,
       body: JSON.stringify({data: res.data})
     });
   }).catch(err => {
-    callback(err, {
-      statusCode: 502,
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: err
+    let statusCode;
+    if (err.response.status === 400) {
+      statusCode = 409;
+    } else {
+      statusCode = err.response.status;
+    }
+    callback(null, {
+      statusCode,
+      headers,
+      body: JSON.stringify({error: err})
     });
   });
 }

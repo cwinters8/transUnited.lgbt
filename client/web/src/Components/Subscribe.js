@@ -1,5 +1,6 @@
 import React from 'react';
 import {ModalBody, Form, FormGroup, Label, Input, Button} from 'reactstrap';
+import axios from 'axios';
 
 class Subscribe extends React.Component {
   submit = () => {
@@ -7,35 +8,23 @@ class Subscribe extends React.Component {
     const firstName = document.getElementById('firstName').value;
     const lastName = document.getElementById('lastName').value;
     const email = document.getElementById('email').value;
-    const form = document.getElementById('subscribeForm');
-    const button = document.getElementById('submit');
+    const formId = 'subscribeForm';
+    const buttonId = 'submit';
     const emptyFieldErrorId = 'emptyFieldError';
-    const emptyFieldError = document.getElementById(emptyFieldErrorId);
     const invalidEmailId = 'invalidEmail';
-    const invalidEmail = document.getElementById(invalidEmailId);
     if (!firstName || !lastName || !email) {
       // remove other error if necessary
-      if (invalidEmail && this.validateEmail(email)) {
-        form.removeChild(invalidEmail);
+      if (this.validateEmail(email)) {
+        this.removeElement(invalidEmailId, formId);
       }
-      if (!emptyFieldError) {
-        const error = document.createElement('p');
-        error.textContent = 'Please fill in all fields';
-        error.id = emptyFieldErrorId;
-        form.insertBefore(error, button);
-      }
+      this.renderError(emptyFieldErrorId, 'Please fill in all fields', formId, buttonId);
     } else if (!this.validateEmail(email)) {
       // first remove other error if necessary
-      if (emptyFieldError && firstName && lastName && email) {
-        form.removeChild(emptyFieldError);
+      if (firstName && lastName && email) {
+        this.removeElement(emptyFieldErrorId, formId);
       }
       // then append new validation error
-      if (!invalidEmail) {
-        const error = document.createElement('p');
-        error.textContent = 'Please provide a valid email address';
-        error.id = 'invalidEmail';
-        form.insertBefore(error, button);
-      }
+      this.renderError(invalidEmailId, 'Please provide a valid email address', formId, buttonId);
     } else {
       // conditionally set the URL depending on env
       let url = '';
@@ -44,29 +33,86 @@ class Subscribe extends React.Component {
       }
       url += '/.netlify/functions/subscribe';
       // execute function that submits to the MailChimp API
-      fetch(url, {
-        method: 'POST',
+      axios.post(url, JSON.stringify({
+        email,
+        firstName,
+        lastName
+      }), {
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email,
-          firstName,
-          lastName
-        })
+        }
       }).then(res => {
-        console.log(res);
+        if (process.env.NODE_ENV === 'development') {
+          console.log(res);
+        }
         this.props.toggleModal();
       }).catch(err => {
-        console.error(err);
-        // TODO: Append an error message to the DOM
+        // remove existing errors
+        const alreadySubscribedId = 'alreadySubscribed';
+        const genericErrorId = 'genericError';
+        this.removeElement(invalidEmailId, formId);
+        this.removeElement(emptyFieldErrorId, formId);
+        this.removeElement(alreadySubscribedId, formId);
+        this.removeElement(genericErrorId, formId);
+        if (err.response.status === 409) {
+          // append an error indicating the email has already been subscribed if the response code is 409
+          this.renderError(alreadySubscribedId, 'Email address already subscribed!', formId, buttonId);
+        } else {
+          // append a generic error for any other response codes
+          this.renderError(genericErrorId, 'Something went wrong! Please try again.', formId, buttonId);
+        }
       });
     }
   }
+  /**
+   * Checks whether a given string is a valid email address.
+   *
+   * @param {*} email - The string to validate.
+   * @returns true or false
+   */
   validateEmail = email => {
     const emailRegex = /^[^@]+@[^@]+\.[a-z]+$/i;
     return emailRegex.test(email);
   }
+  
+  /**
+   * Renders an error to the DOM
+   *
+   * @param {*} id - The ID attribute for the error element.
+   * @param {*} text - The text representing the error.
+   * @param {*} insertIntoId - The ID of the parent element the error should be appended to.
+   * @param {*} insertBeforeId - The ID of the element the error should be inserted before.
+   * @returns the error element
+   */
+  renderError = (id, text, insertIntoId, insertBeforeId) => {
+    const existingError = document.getElementById(id);
+    const insertInto = document.getElementById(insertIntoId);
+    const insertBefore = document.getElementById(insertBeforeId);
+    if (!existingError) {
+      const error = document.createElement('p');
+      error.id = id;
+      error.textContent = text;
+      insertInto.insertBefore(error, insertBefore);
+      return error;
+    } else {
+      return existingError;
+    }
+  }
+
+  /**
+   * Removes an element from the DOM if it exists
+   *
+   * @param {*} id - The ID of the element to be removed.
+   * @param {*} parentId - The ID of the parent element.
+   */
+  removeElement = (id, parentId) => {
+    const element = document.getElementById(id);
+    const parent = document.getElementById(parentId);
+    if (element) {
+      parent.removeChild(element);
+    }
+  }
+
   componentDidMount() {
     const form = document.getElementById('subscribeForm');
     // handle case when enter key is pressed to submit form
