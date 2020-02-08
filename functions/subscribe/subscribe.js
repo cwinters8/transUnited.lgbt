@@ -5,7 +5,7 @@ exports.handler = (event, context, callback) => {
   // handle OPTIONS requests - should enable CORS
   console.log(event.httpMethod);
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS'
   };
