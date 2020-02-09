@@ -4,3 +4,8 @@ functions = "functions"
 
 [dev]
 command = "cd client/web && npm start"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
