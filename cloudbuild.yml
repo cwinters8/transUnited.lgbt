@@ -6,5 +6,5 @@ steps:
     args: ['run', 'build']
     dir: 'client/web'
   - name: 'gcr.io/$PROJECT_ID/firebase'
-    args: ['deploy']
+    args: ['deploy', '--project', '$PROJECT_ID']
     dir: 'client/web'
