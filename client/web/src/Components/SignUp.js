@@ -53,7 +53,7 @@ class SignUp extends React.Component {
   InvalidEmail = () => {
     if (!this.state.isValidEmail) {
       return (
-        <p>Please provide a valid email address</p>
+        <p className="error">Please provide a valid email address</p>
       );
     } else {
       return null;

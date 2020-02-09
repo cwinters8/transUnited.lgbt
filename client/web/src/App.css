@@ -43,3 +43,8 @@
 #customPronouns {
   margin-top: 5px;
 }
+
+.error {
+  font-size: calc(10px + 1vmin);
+  margin-top: 5px;
+}
