@@ -1,9 +1,16 @@
 steps:
+  # install front end dependencies
   - name: 'gcr.io/cloud-builders/npm'
     args: ['install']
     dir: 'client/web'
+  # create front end prod build
   - name: 'gcr.io/cloud-builders/npm'
     args: ['run', 'build']
     dir: 'client/web'
+  # install function dependencies
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+    dir: 'functions'
+  # deploy front end and functions to Firebase
   - name: 'gcr.io/$PROJECT_ID/firebase'
     args: ['deploy', '--project', '$PROJECT_ID']

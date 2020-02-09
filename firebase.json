@@ -13,7 +13,5 @@
       }
     ]
   },
-  "functions": {
-    "predeploy": "npm install"
-  }
+  "functions": {}
 }
