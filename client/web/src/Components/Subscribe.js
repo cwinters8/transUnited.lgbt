@@ -14,11 +14,11 @@ class Subscribe extends React.Component {
     const invalidEmailId = 'invalidEmail';
     if (!firstName || !lastName || !email) {
       // remove other error if necessary
-      if (this.validateEmail(email)) {
+      if (this.props.validateEmail(email)) {
         this.removeElement(invalidEmailId, formId);
       }
       this.renderError(emptyFieldErrorId, 'Please fill in all fields', formId, buttonId);
-    } else if (!this.validateEmail(email)) {
+    } else if (!this.props.validateEmail(email)) {
       // first remove other error if necessary
       if (firstName && lastName && email) {
         this.removeElement(emptyFieldErrorId, formId);
@@ -63,16 +63,6 @@ class Subscribe extends React.Component {
         }
       });
     }
-  }
-  /**
-   * Checks whether a given string is a valid email address.
-   *
-   * @param {*} email - The string to validate.
-   * @returns true or false
-   */
-  validateEmail = email => {
-    const emailRegex = /^[^@]+@[^@]+\.[a-z]+$/i;
-    return emailRegex.test(email);
   }
   
   /**
