@@ -10,15 +10,7 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 
 exports.subscribe = functions.https.onRequest((req, res) => {
   // add response headers
-  res.setHeader('Access-Control-Allow-Origin', [
-    // local dev
-    'http://localhost:3000', 
-    // Firebase staging
-    'https://transunited.web.app/', 
-    'https://transunited.firebaseapp.com/',
-    // Prod
-    'https://transunited.lgbt'
-  ]);
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000, https://transunited.web.app, https://transunited.firebaseapp.com, https://transunited.lgbt');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
 
