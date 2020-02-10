@@ -9,8 +9,24 @@ exports.helloWorld = functions.https.onRequest((request, response) => {
 });
 
 exports.subscribe = functions.https.onRequest((req, res) => {
-  // add response headers
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000, https://transunited.web.app, https://transunited.firebaseapp.com, https://transunited.lgbt');
+  // parse the origin and decide if its allowed
+  const allowedOrigins = [
+    // local dev
+    'http://localhost:3000',
+    // Firebase staging
+    'https://transunited.web.app',
+    'https://transunited.firebaseapp.com',
+    // Prod
+    'https://transunited.lgbt'
+  ];
+  if (allowedOrigins.includes(req.headers.origin)) {
+    console.log(`Origin ${req.headers.origin} allowed`);
+    // set the allow-origin header if this origin is allowed
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+  } else {
+    console.log(`Origin ${req.headers.origin} blocked`);
+  }
+  // add other response headers
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
 
