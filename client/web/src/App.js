@@ -3,9 +3,6 @@ import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import './App.css';
 import {Navbar, NavbarBrand, Nav, NavItem, NavLink, Modal, ModalHeader} from 'reactstrap';
 
-import firebase from 'firebase/app';
-import 'firebase/functions';
-
 import Main from './Components/Main';
 import Subscribe from './Components/Subscribe';
 import SignUp from './Components/SignUp';
@@ -13,14 +10,6 @@ import SignUp from './Components/SignUp';
 const App = () => {
   const [modal, setModal] = useState(false);
   const toggleModal = () => setModal(!modal);
-
-  firebase.initializeApp({
-    projectId: 'transunited'
-  });
-  const functions = firebase.functions();
-  functions.httpsCallable('helloWorld')().then(response => {
-    console.log(response);
-  });
 
   /**
    * Checks whether a given string is a valid email address.

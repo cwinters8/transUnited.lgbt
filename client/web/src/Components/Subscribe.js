@@ -12,6 +12,10 @@ class Subscribe extends React.Component {
     const buttonId = 'submit';
     const emptyFieldErrorId = 'emptyFieldError';
     const invalidEmailId = 'invalidEmail';
+    const alreadySubscribedId = 'alreadySubscribed';
+    const genericErrorId = 'genericError';
+    const errors = [emptyFieldErrorId, invalidEmailId, alreadySubscribedId, genericErrorId];
+    const genericError = 'Something went wrong! Please try again.';
     if (!firstName || !lastName || !email) {
       // remove other error if necessary
       if (this.props.validateEmail(email)) {
@@ -29,9 +33,11 @@ class Subscribe extends React.Component {
       // conditionally set the URL depending on env
       let url = '';
       if (process.env.NODE_ENV === 'development') {
-        url += 'http://localhost:34567'
+        url += 'http://localhost:5000/transunited/us-central1';
+      } else {
+        url += 'https://us-central1-transunited.cloudfunctions.net';
       }
-      url += '/.netlify/functions/subscribe';
+      url += '/subscribe';
       // execute function that submits to the MailChimp API
       axios.post(url, JSON.stringify({
         email,
@@ -42,25 +48,28 @@ class Subscribe extends React.Component {
           'Content-Type': 'application/json'
         }
       }).then(res => {
+        // remove existing errors
+        this.removeErrors(errors, formId);
+        // log response to the console if this is dev
         if (process.env.NODE_ENV === 'development') {
           console.log(res);
         }
-        this.props.toggleModal();
+        if (res.data.statusCode === 409) {
+          // append an error indicating the email has already been subscribed
+          this.renderError(alreadySubscribedId, 'Email address already subscribed!', formId, buttonId);
+        } else if (res.data.statusCode === 200) {
+          // close modal if request was successful
+          this.props.toggleModal();
+        } else {
+          // append a generic error
+          this.renderError(genericErrorId, genericError, formId, buttonId);
+        }
       }).catch(err => {
         // remove existing errors
-        const alreadySubscribedId = 'alreadySubscribed';
-        const genericErrorId = 'genericError';
-        this.removeElement(invalidEmailId, formId);
-        this.removeElement(emptyFieldErrorId, formId);
-        this.removeElement(alreadySubscribedId, formId);
-        this.removeElement(genericErrorId, formId);
-        if (err.response.status === 409) {
-          // append an error indicating the email has already been subscribed if the response code is 409
-          this.renderError(alreadySubscribedId, 'Email address already subscribed!', formId, buttonId);
-        } else {
-          // append a generic error for any other response codes
-          this.renderError(genericErrorId, 'Something went wrong! Please try again.', formId, buttonId);
-        }
+        this.removeErrors(errors, formId);
+        // append a generic error
+        this.renderError(genericErrorId, genericError, formId, buttonId);
+        console.error(err);
       });
     }
   }
@@ -87,6 +96,18 @@ class Subscribe extends React.Component {
     } else {
       return existingError;
     }
+  }
+
+  /**
+   * Removes a given set of IDs from an element
+   *
+   * @param {array} errorIds
+   * @param {string} formId
+   */
+  removeErrors = (errorIds, formId) => {
+    errorIds.forEach(id => {
+      this.removeElement(id, formId);
+    });
   }
 
   /**
