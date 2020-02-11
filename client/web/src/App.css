@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Sriracha&display=swap');
+
 :root {
   --main-bg-color: #282c34;
   --main-text-color: white;
@@ -21,6 +23,33 @@
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.visionHeader {
+  margin-top: 20px;
+}
+
+.bio {
+  text-align: left;
+}
+
+.bio * {
+  margin: 12px;
+}
+
+@media (min-width: 900px) {
+  .bio-flex {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+.bioImage {
+  max-height: 300px;
+}
+
+.bioName {
+  font-family: 'Sriracha', cursive;
 }
 
 @media (prefers-reduced-motion: no-preference) {
