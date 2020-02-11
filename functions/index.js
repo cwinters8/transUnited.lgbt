@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const axios = require('axios').default;
+const api = require('./api');
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -67,3 +68,5 @@ exports.subscribe = functions.https.onRequest((req, res) => {
     });
   });
 });
+
+exports.api = functions.https.onRequest(api);
