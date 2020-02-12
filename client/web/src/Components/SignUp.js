@@ -1,5 +1,6 @@
 import React from 'react';
 import {Form, FormGroup, Label, Input, Button} from 'reactstrap';
+import aes from 'crypto-js/aes';
 
 class SignUp extends React.Component {
   state = {
@@ -9,6 +10,7 @@ class SignUp extends React.Component {
     lastName: null,
     pronouns: null,
     email: null,
+    password: null,
     dob: null
   };
   pronouns = [
@@ -37,6 +39,11 @@ class SignUp extends React.Component {
       this.setState({isValidEmail: false});
     }
   }
+  processPassword = event => {
+    // TODO: enforce some password complexity
+    const encrypted = aes.encrypt(event.target.value, process.env.REACT_APP_SECRET_KEY).toString();
+    this.setState({password: encrypted});
+  }
   // TODO: processDob function to validate user is 18+
   CustomPronouns = () => {
     if (this.state.showCustomPronounField) {
@@ -62,8 +69,15 @@ class SignUp extends React.Component {
 
   submit = event => {
     event.preventDefault();
-    console.log('submitted!');
-    // TODO: execute a function that handles user sign up
+    this.props.firebase.auth().createUserWithEmailAndPassword(
+      this.state.email, 
+      aes.decrypt(this.state.password, process.env.REACT_APP_SECRET_KEY).toString()
+    ).then(data => {
+      console.log("Successfully created a user! Here's some output:");
+      console.log(data.user.uid);
+    }).catch(err => {
+      console.log(`Error: ${err}`);
+    });
   }
 
   render() {
@@ -80,8 +94,10 @@ class SignUp extends React.Component {
           </Input>
           <this.CustomPronouns />
           <Label>Email</Label>
-          <Input required type="email" onChange={this.processEmail} />
+          <Input required type="email" autoComplete="email" onChange={this.processEmail} />
           <this.InvalidEmail />
+          <Label>Password</Label>
+          <Input required type="password" autoComplete="current-password" onChange={this.processPassword} />
           <Label>Date of birth</Label>
           <Input required type="date" onChange={event => this.setState({dob: event.target.value})}  />
         </FormGroup>
